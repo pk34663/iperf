@@ -42,6 +42,8 @@
 #include "iperf_tcp.h"
 #include "net.h"
 #include "cjson.h"
+#include "units.h"
+#include "iperf_locale.h"
 
 #if defined(HAVE_FLOWLABEL)
 #include "flowlabel.h"
@@ -366,6 +368,7 @@ iperf_tcp_connect(struct iperf_test *test)
 {
     struct addrinfo hints, *local_res, *server_res;
     char portstr[6];
+    char ubuf[UNIT_LEN];
     int s, opt;
     socklen_t optlen;
     int saved_errno;
@@ -520,6 +523,8 @@ iperf_tcp_connect(struct iperf_test *test)
 	return -1;
     }
 
+    unit_snprintf(ubuf,UNIT_LEN,(double)sndbuf_actual,'A');
+    iperf_printf(test, report_window, ubuf);
     /* Read back and verify the receiver socket buffer size */
     optlen = sizeof(rcvbuf_actual);
     if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, &rcvbuf_actual, &optlen) < 0) {
